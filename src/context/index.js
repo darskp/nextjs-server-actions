@@ -1,15 +1,21 @@
 "use client"
-import React, { Children, createContext, useState } from 'react';
+import { addNewUserFormInitials } from '@/utils';
+import { createContext, useState } from 'react';
 
 export const UserContext = createContext(null);
-export const UserState = () => {
+
+export const UserState = ({ children }) => {
     const [currentEditedID, setCurrentEditedId] = useState(null);
+    const [openPopup, setOpenPopup] = useState(false);
+    const [addNewUserFormData, setAddNewUserFormData] = useState(addNewUserFormInitials);
+
     const value = {
-        currentEditedID, setCurrentEditedId
+        currentEditedID, setCurrentEditedId, openPopup, setOpenPopup, addNewUserFormData, setAddNewUserFormData
     }
+
     return (
         <UserContext.Provider value={value}>
-            {Children}
+            {children}
         </UserContext.Provider>
 
     )

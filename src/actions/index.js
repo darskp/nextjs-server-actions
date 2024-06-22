@@ -79,14 +79,17 @@ export const deleteUserAction = async (deleteUserId, revalidate) => {
 
 export const updateUserAction = async (formData, userID, revalidate) => {
     await dbConnection();
+
     const filter = {
         _id: userID
     }
+
     try {
         const updatedUserData = await User.findByIdAndUpdate(
             filter, formData, {
             new: true
         })
+        console.log("updatedUserData",updatedUserData)
         if (updatedUserData) {
             revalidatePath(revalidate)
             return {

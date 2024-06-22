@@ -1,5 +1,5 @@
 "use client"
-import { addNewUserServerAction } from "@/actions"
+import { addNewUserServerAction, updateUserAction } from "@/actions"
 import { Button } from "@/components/ui/button"
 import {
     Dialog,
@@ -10,20 +10,26 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { UserContext } from "@/context"
 import { addNewUserFormControls, addNewUserFormInitials } from "@/utils"
-import { useState } from "react"
+import { useContext } from "react"
+import { useToast } from "@/components/ui/use-toast"
 
 const AddNewUser = () => {
-    const [openPopup, setOpenPopup] = useState(false);
-    const [addNewUserFormData, setAddNewUserFormData] = useState(addNewUserFormInitials);
+    const { toast } = useToast();
+    const { currentEditedID, setCurrentEditedId, openPopup, setOpenPopup, addNewUserFormData, setAddNewUserFormData } = useContext(UserContext);
 
     function handleSaveButton() {
-        return Object.values(addNewUserFormData).every((key) => (key !== ''))
+        return Object.keys(addNewUserFormData).every((key) => (key !== ''))
     }
 
     const handleNewUserAction = async () => {
-        const result = await addNewUserServerAction(addNewUserFormData,'');
-        console.log(addNewUserFormData);
+        const result = !currentEditedID ? await addNewUserServerAction(addNewUserFormData, '/user-management') : await updateUserAction(addNewUserFormData,currentEditedID,  '/user-management');
+        if (result) {
+            toast({
+                title: result?.message
+            })
+        }
         setAddNewUserFormData(addNewUserFormInitials);
         setOpenPopup(false)
     }
@@ -37,12 +43,12 @@ const AddNewUser = () => {
             }}>
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
-                        <DialogTitle>Add New User</DialogTitle>
+                        <DialogTitle>{currentEditedID ? 'Edit User' : 'Add New User'}</DialogTitle>
                     </DialogHeader>
                     <form action={handleNewUserAction} className="grid gap-4 py-4">
                         {
                             addNewUserFormControls?.map((controlItem, index) => (
-                                <div className="grid grid-cols-4 items-center gap-4">
+                                <div className="grid grid-cols-4 items-center gap-4" key={controlItem?.id}>
                                     <Label htmlFor={controlItem?.name} className="text-right">
                                         {controlItem?.label}
                                     </Label>
